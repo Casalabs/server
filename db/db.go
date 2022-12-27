@@ -34,8 +34,8 @@ func DBConnect() {
 	}
 	fmt.Println("============DB connect==================")
 	db = client
-
 }
+
 
 func Close() {
 	err := db.Disconnect(context.TODO())
@@ -103,5 +103,4 @@ func FindAndUpdate(collectionName, key, value string, data interface{}) {
 	collection := db.Database(dbName).Collection(collectionName)
 	filter := bson.D{{Key: key, Value: value}}
 	collection.FindOneAndReplace(ctx, filter, data)
-
 }

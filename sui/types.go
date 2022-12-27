@@ -65,12 +65,13 @@ type EventResponse struct {
 					Sender            string `json:"sender"`
 					Type              string `json:"type"`
 					Fields            struct {
-						BetAmount     int    `json:"bet_amount"`
-						BetValue      []int  `json:"bet_value"`
-						Gamer         string `json:"gamer"`
-						IsJackpot     bool   `json:"is_jackpot"`
-						JackpotAmount int    `json:"jackpot_amount"`
-						JackpotValue  []int  `json:"jackpot_value"`
+						BetAmount     string   `json:"bet_amount"`
+						BetValue      []string `json:"bet_value"`
+						Gamer         string   `json:"gamer"`
+						IsJackpot     bool     `json:"is_jackpot"`
+						JackpotAmount string   `json:"jackpot_amount"`
+						JackpotValue  []string `json:"jackpot_value"`
+						PoolBalance   string   `json:"pool_balance"`
 					} `json:"fields"`
 					Bcs string `json:"bcs"`
 				} `json:"moveEvent"`

@@ -8,15 +8,15 @@ import (
 	"net/url"
 	"sync"
 
-	"github.com/coming-chat/go-sui/account"
 	"github.com/coming-chat/go-sui/client"
+	"github.com/donggyuLim/suino-server/db"
+	"github.com/donggyuLim/suino-server/utils"
 	"github.com/gorilla/websocket"
 )
 
 type Sui struct {
 	SocketClient *websocket.Conn
 	RPC          *client.Client
-	Account      *account.Account
 }
 
 func NewClient(socketHost, rpcEndpoint string, wg *sync.WaitGroup) Sui {
@@ -53,24 +53,60 @@ func (s *Sui) HandleMsg(ch chan interface{}) {
 		if err != nil {
 			fmt.Println("read:", err)
 		}
-		fmt.Println("message:", string(message))
 
-		response := EventResponse{}
-		err = json.Unmarshal(message, &response)
+		event := EventResponse{}
+		err = json.Unmarshal(message, &event)
 		if err != nil {
 			fmt.Println("Marshal :", err.Error())
 			continue
 		}
+		data := Data{
+			TimeStamp: event.Params.Result.Timestamp,
+			TxDigest:  event.Params.Result.TxDigest,
+			Module:    event.Params.Result.Event.MoveEvent.TransactionModule,
+			MoveEvent: MoveEvent{
+				Gamer:         event.Params.Result.Event.MoveEvent.Fields.Gamer,
+				BetAmount:     event.Params.Result.Event.MoveEvent.Fields.BetAmount,
+				BetValue:      event.Params.Result.Event.MoveEvent.Fields.BetValue,
+				IsJackpot:     event.Params.Result.Event.MoveEvent.Fields.IsJackpot,
+				JackpotAmount: event.Params.Result.Event.MoveEvent.Fields.JackpotAmount,
+				JackpotValue:  event.Params.Result.Event.MoveEvent.Fields.JackpotValue,
+				PoolBalance:   event.Params.Result.Event.MoveEvent.Fields.PoolBalance,
+			},
+		}
+		fmt.Println(data)
 
-		fmt.Println("RESPONSE======", response)
-
-		fmt.Println("")
+		HandleDB(data)
 		// event := Event{
 		// 	Type: response.Params.Result.Event.MoveEvent.TransactionModule,
 		// 	Event:
 		// }
 
-		ch <- message
+		ch <- data
+	}
+}
+
+type Data struct {
+	TimeStamp int64
+	TxDigest  string
+	Module    string
+	MoveEvent MoveEvent
+}
+
+type MoveEvent struct {
+	Gamer         string
+	BetAmount     string
+	BetValue      []string
+	IsJackpot     bool
+	JackpotAmount string
+	JackpotValue  []string
+	PoolBalance   string
+}
+
+func HandleDB(data Data) {
+	switch data.Module {
+	case "flip", "race":
+		db.Insert("game", data)
 	}
 }
 
@@ -81,7 +117,7 @@ func subscribe(c *websocket.Conn) {
 				EventType: "MoveEvent",
 			},
 			{
-				Package: "0x8391436389a857bfd1493294d1c106cbde3a6800",
+				Package: utils.LoadENV("CONTRACT"),
 			},
 		},
 	}

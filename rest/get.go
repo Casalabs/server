@@ -8,19 +8,18 @@ import (
 )
 
 func RecentBettingList(c *gin.Context) {
-	list, err := db.Find("betting", "", "", 10)
+	list, err := db.Find("game", "", "", 10)
 	if err != nil {
 		fmt.Println(err)
 		c.String(404, err.Error())
 		return
 	}
-
 	c.JSON(200, list)
 }
 
 func UserBettingList(c *gin.Context) {
 	user := c.Param("user")
-	list, err := db.Find("betting", "sender", user, 0)
+	list, err := db.Find("game", "gamer", user, 0)
 	if err != nil {
 		fmt.Println(err)
 		c.String(404, err.Error())
