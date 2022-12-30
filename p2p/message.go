@@ -2,6 +2,7 @@ package p2p
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/donggyuLim/suino-server/utils"
 )
@@ -11,7 +12,8 @@ type Message struct {
 	Payload interface{} `json:"payload"`
 }
 
-func HandleMsg(ch chan interface{}) {
+func HandleMsg(wg *sync.WaitGroup, ch chan interface{}) {
+	defer wg.Done()
 	for {
 		message, ok := <-ch
 		if !ok {

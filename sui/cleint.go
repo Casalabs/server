@@ -6,7 +6,6 @@ import (
 	"log"
 
 	"net/url"
-	"sync"
 
 	"github.com/coming-chat/go-sui/client"
 	"github.com/donggyuLim/suino-server/db"
@@ -15,15 +14,16 @@ import (
 )
 
 type Sui struct {
-	SocketClient *websocket.Conn
-	RPC          *client.Client
+	SocketClient websocket.Conn
+	RPC          client.Client
 }
 
-func NewClient(socketHost, rpcEndpoint string, wg *sync.WaitGroup) Sui {
-	defer wg.Done()
+func NewClient(socketHost, rpcEndpoint string) Sui {
+	// defer wg.Done()
 	u := url.URL{Scheme: "wss", Host: socketHost}
+	dial := websocket.DefaultDialer
 
-	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	conn, _, err := dial.Dial(u.String(), nil)
 	if err != nil {
 		log.Fatal("dial:", err)
 	}
@@ -34,31 +34,59 @@ func NewClient(socketHost, rpcEndpoint string, wg *sync.WaitGroup) Sui {
 	}
 
 	sui := Sui{
-		SocketClient: conn,
-		RPC:          rpc,
+		SocketClient: *conn,
+		RPC:          *rpc,
 	}
 	return sui
 }
 
-type Event struct {
-	Type  string      `json:"Type"`
-	Event interface{} `json:"event"`
+func subscribe(c *websocket.Conn) {
+	params := Params{
+		All: []All{
+			{
+				EventType: "MoveEvent",
+			},
+			{
+				Package: utils.LoadENV("CONTRACT"),
+			},
+		},
+	}
+
+	subscribe := SubscribeEvent{
+		Jsonrpc: "2.0",
+		ID:      1,
+		Method:  "sui_subscribeEvent",
+		Params:  []Params{params},
+	}
+
+	err := c.WriteJSON(subscribe)
+	if err != nil {
+		log.Println("write:", err)
+	}
+
+	_, _, err = c.ReadMessage()
+	if err != nil {
+		log.Println("write:", err.Error())
+	}
+	fmt.Println("Subscribe!!!")
 }
 
-func (s *Sui) HandleMsg(ch chan interface{}) {
+func (s *Sui) HandleMsg(ch chan interface{}) error {
 	defer s.SocketClient.Close()
-	subscribe(s.SocketClient)
+	subscribe(&s.SocketClient)
 	for {
 		_, message, err := s.SocketClient.ReadMessage()
 		if err != nil {
-			fmt.Println("read:", err)
+			fmt.Println("Read:", err)
+
+			return err
 		}
 
 		event := EventResponse{}
 		err = json.Unmarshal(message, &event)
 		if err != nil {
 			fmt.Println("Marshal :", err.Error())
-			continue
+			return err
 		}
 		data := Data{
 			TimeStamp: event.Params.Result.Timestamp,
@@ -86,56 +114,9 @@ func (s *Sui) HandleMsg(ch chan interface{}) {
 	}
 }
 
-type Data struct {
-	TimeStamp int64
-	TxDigest  string
-	Module    string
-	MoveEvent MoveEvent
-}
-
-type MoveEvent struct {
-	Gamer         string
-	BetAmount     string
-	BetValue      []string
-	IsJackpot     bool
-	JackpotAmount string
-	JackpotValue  []string
-	PoolBalance   string
-}
-
 func HandleDB(data Data) {
 	switch data.Module {
 	case "flip", "race":
 		db.Insert("game", data)
 	}
-}
-
-func subscribe(c *websocket.Conn) {
-	params := Params{
-		All: []All{
-			{
-				EventType: "MoveEvent",
-			},
-			{
-				Package: utils.LoadENV("CONTRACT"),
-			},
-		},
-	}
-
-	subscribe := SubscribeEvent{
-		Jsonrpc: "2.0",
-		ID:      1,
-		Method:  "sui_subscribeEvent",
-		Params:  []Params{params},
-	}
-
-	err := c.WriteJSON(subscribe)
-	if err != nil {
-		log.Println("write:", err)
-	}
-	_, _, err = c.ReadMessage()
-	if err != nil {
-		log.Println("write:", err.Error())
-	}
-
 }

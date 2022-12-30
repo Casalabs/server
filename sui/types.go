@@ -79,3 +79,20 @@ type EventResponse struct {
 		} `json:"result"`
 	} `json:"params"`
 }
+
+type Data struct {
+	TimeStamp int64
+	TxDigest  string
+	Module    string
+	MoveEvent MoveEvent
+}
+
+type MoveEvent struct {
+	Gamer         string
+	BetAmount     string
+	BetValue      []string
+	IsJackpot     bool
+	JackpotAmount string
+	JackpotValue  []string
+	PoolBalance   string
+}
