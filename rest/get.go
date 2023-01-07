@@ -19,7 +19,9 @@ func RecentBettingList(c *gin.Context) {
 
 func UserBettingList(c *gin.Context) {
 	user := c.Param("user")
-	list, err := db.Find("game", "gamer", user, 0)
+	fmt.Println("=====================================")
+	fmt.Println(user)
+	list, err := db.Find("game", "moveevent", user, 0)
 	if err != nil {
 		fmt.Println(err)
 		c.String(404, err.Error())

@@ -81,13 +81,9 @@ type EventResponse struct {
 }
 
 type Data struct {
-	TimeStamp int64
-	TxDigest  string
-	Module    string
-	MoveEvent MoveEvent
-}
-
-type MoveEvent struct {
+	TimeStamp     int64
+	TxDigest      string
+	Module        string
 	Gamer         string
 	BetAmount     string
 	BetValue      []string
@@ -95,4 +91,7 @@ type MoveEvent struct {
 	JackpotAmount string
 	JackpotValue  []string
 	PoolBalance   string
+}
+
+type MoveEvent struct {
 }

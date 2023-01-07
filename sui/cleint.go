@@ -75,10 +75,10 @@ func (s *Sui) HandleMsg(ch chan interface{}) error {
 	defer s.SocketClient.Close()
 	subscribe(&s.SocketClient)
 	for {
+		fmt.Println("Handle MSG")
 		_, message, err := s.SocketClient.ReadMessage()
 		if err != nil {
 			fmt.Println("Read:", err)
-
 			return err
 		}
 
@@ -89,26 +89,20 @@ func (s *Sui) HandleMsg(ch chan interface{}) error {
 			return err
 		}
 		data := Data{
-			TimeStamp: event.Params.Result.Timestamp,
-			TxDigest:  event.Params.Result.TxDigest,
-			Module:    event.Params.Result.Event.MoveEvent.TransactionModule,
-			MoveEvent: MoveEvent{
-				Gamer:         event.Params.Result.Event.MoveEvent.Fields.Gamer,
-				BetAmount:     event.Params.Result.Event.MoveEvent.Fields.BetAmount,
-				BetValue:      event.Params.Result.Event.MoveEvent.Fields.BetValue,
-				IsJackpot:     event.Params.Result.Event.MoveEvent.Fields.IsJackpot,
-				JackpotAmount: event.Params.Result.Event.MoveEvent.Fields.JackpotAmount,
-				JackpotValue:  event.Params.Result.Event.MoveEvent.Fields.JackpotValue,
-				PoolBalance:   event.Params.Result.Event.MoveEvent.Fields.PoolBalance,
-			},
+			TimeStamp:     event.Params.Result.Timestamp,
+			TxDigest:      event.Params.Result.TxDigest,
+			Module:        event.Params.Result.Event.MoveEvent.TransactionModule,
+			Gamer:         event.Params.Result.Event.MoveEvent.Fields.Gamer,
+			BetAmount:     event.Params.Result.Event.MoveEvent.Fields.BetAmount,
+			BetValue:      event.Params.Result.Event.MoveEvent.Fields.BetValue,
+			IsJackpot:     event.Params.Result.Event.MoveEvent.Fields.IsJackpot,
+			JackpotAmount: event.Params.Result.Event.MoveEvent.Fields.JackpotAmount,
+			JackpotValue:  event.Params.Result.Event.MoveEvent.Fields.JackpotValue,
+			PoolBalance:   event.Params.Result.Event.MoveEvent.Fields.PoolBalance,
 		}
 		fmt.Println(data)
 
 		HandleDB(data)
-		// event := Event{
-		// 	Type: response.Params.Result.Event.MoveEvent.TransactionModule,
-		// 	Event:
-		// }
 
 		ch <- data
 	}
