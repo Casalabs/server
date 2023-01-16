@@ -98,7 +98,7 @@ func (s *Sui) HandleMsg(ch chan interface{}) error {
 func handleData(data EventResponse, ch chan interface{}) {
 	result := data.Params.Result
 	switch result.Event.MoveEvent.TransactionModule {
-	case "flip", "race":
+	case "flip":
 
 		f := &FlipEvent{}
 
