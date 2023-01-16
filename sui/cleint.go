@@ -119,6 +119,7 @@ func handleData(data EventResponse, ch chan interface{}) {
 			JackpotValue:  f.JackpotValue,
 			PoolBalance:   f.PoolBalance,
 		}
+		log.Println(data)
 		db.Insert("game", data)
 		ch <- data
 	case "nft":
