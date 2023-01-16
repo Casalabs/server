@@ -8,9 +8,11 @@ require (
 )
 
 require (
+	github.com/gin-contrib/cors v1.4.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
@@ -35,6 +37,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.1 // indirect
+	github.com/rs/cors v1.8.3
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/ybbus/jsonrpc/v3 v3.1.1
 	go.mongodb.org/mongo-driver v1.11.0

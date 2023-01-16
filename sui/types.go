@@ -60,20 +60,12 @@ type EventResponse struct {
 			} `json:"id"`
 			Event struct {
 				MoveEvent struct {
-					PackageID         string `json:"packageId"`
-					TransactionModule string `json:"transactionModule"`
-					Sender            string `json:"sender"`
-					Type              string `json:"type"`
-					Fields            struct {
-						BetAmount     string   `json:"bet_amount"`
-						BetValue      []string `json:"bet_value"`
-						Gamer         string   `json:"gamer"`
-						IsJackpot     bool     `json:"is_jackpot"`
-						JackpotAmount string   `json:"jackpot_amount"`
-						JackpotValue  []string `json:"jackpot_value"`
-						PoolBalance   string   `json:"pool_balance"`
-					} `json:"fields"`
-					Bcs string `json:"bcs"`
+					PackageID         string                 `json:"packageId"`
+					TransactionModule string                 `json:"transactionModule"`
+					Sender            string                 `json:"sender"`
+					Type              string                 `json:"type"`
+					Fields            map[string]interface{} `json:"fields"`
+					Bcs               string                 `json:"bcs"`
 				} `json:"moveEvent"`
 			} `json:"event"`
 		} `json:"result"`
@@ -81,9 +73,9 @@ type EventResponse struct {
 }
 
 type Data struct {
+	Module        string
 	TimeStamp     int64
 	TxDigest      string
-	Module        string
 	Gamer         string
 	BetAmount     string
 	BetValue      []string
@@ -91,6 +83,16 @@ type Data struct {
 	JackpotAmount string
 	JackpotValue  []string
 	PoolBalance   string
+}
+
+type FlipEvent struct {
+	BetAmount     string   `mapstructure:"bet_amount"`
+	BetValue      []string `mapstructure:"bet_value"`
+	Gamer         string   `mapstructure:"gamer"`
+	IsJackpot     bool     `mapstructure:"is_jackpot"`
+	JackpotAmount string   `mapstructure:"jackpot_amount"`
+	JackpotValue  []string `mapstructure:"jackpot_value"`
+	PoolBalance   string   `mapstructure:"pool_balance"`
 }
 
 type MoveEvent struct {

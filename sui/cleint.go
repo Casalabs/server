@@ -11,6 +11,7 @@ import (
 	"github.com/donggyuLim/suino-server/db"
 	"github.com/donggyuLim/suino-server/utils"
 	"github.com/gorilla/websocket"
+	"github.com/mitchellh/mapstructure"
 )
 
 type Sui struct {
@@ -88,29 +89,40 @@ func (s *Sui) HandleMsg(ch chan interface{}) error {
 			fmt.Println("Marshal :", err.Error())
 			return err
 		}
-		data := Data{
-			TimeStamp:     event.Params.Result.Timestamp,
-			TxDigest:      event.Params.Result.TxDigest,
-			Module:        event.Params.Result.Event.MoveEvent.TransactionModule,
-			Gamer:         event.Params.Result.Event.MoveEvent.Fields.Gamer,
-			BetAmount:     event.Params.Result.Event.MoveEvent.Fields.BetAmount,
-			BetValue:      event.Params.Result.Event.MoveEvent.Fields.BetValue,
-			IsJackpot:     event.Params.Result.Event.MoveEvent.Fields.IsJackpot,
-			JackpotAmount: event.Params.Result.Event.MoveEvent.Fields.JackpotAmount,
-			JackpotValue:  event.Params.Result.Event.MoveEvent.Fields.JackpotValue,
-			PoolBalance:   event.Params.Result.Event.MoveEvent.Fields.PoolBalance,
-		}
-		fmt.Println(data)
+		// fmt.Println(event.Params.Result.Event.MoveEvent)
+		handleData(event, ch)
 
-		HandleDB(data)
-
-		ch <- data
 	}
 }
 
-func HandleDB(data Data) {
-	switch data.Module {
+func handleData(data EventResponse, ch chan interface{}) {
+	result := data.Params.Result
+	switch result.Event.MoveEvent.TransactionModule {
 	case "flip", "race":
+
+		f := &FlipEvent{}
+
+		fields := result.Event.MoveEvent.Fields
+		err := mapstructure.Decode(fields, f)
+		if err != nil {
+			log.Fatal(err)
+		}
+		data := Data{
+			Module:        result.Event.MoveEvent.TransactionModule,
+			TimeStamp:     result.Timestamp,
+			TxDigest:      result.TxDigest,
+			Gamer:         f.Gamer,
+			BetAmount:     f.BetAmount,
+			BetValue:      f.BetValue,
+			IsJackpot:     f.IsJackpot,
+			JackpotAmount: f.JackpotAmount,
+			JackpotValue:  f.JackpotValue,
+			PoolBalance:   f.PoolBalance,
+		}
 		db.Insert("game", data)
+		ch <- data
+	case "nft":
+
 	}
+
 }
