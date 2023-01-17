@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const port = ":3036"
+const port = ":3306"
 
 func Start(wg *sync.WaitGroup) {
 	r := gin.Default()

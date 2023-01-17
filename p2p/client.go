@@ -9,7 +9,14 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{}
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		// Check against your desired domains here
+		return r.Host == "suino.io"
+	},
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
 
 func Upgrade(c *gin.Context) {
 	openPort := c.Request.URL.Query().Get("openPort")

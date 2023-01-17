@@ -35,6 +35,7 @@ func BroadcastNewEvent(data interface{}) {
 // Message -> json
 func makeMessage(method string, payload interface{}) []byte {
 	m := Message{
+		Method:  method,
 		Payload: payload,
 	}
 	return utils.ToJSON(m)
