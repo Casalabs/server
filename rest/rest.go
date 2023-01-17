@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const port = ":3306"
+const port = ":3036"
 
 func Start(wg *sync.WaitGroup) {
 	r := gin.Default()
@@ -17,7 +17,7 @@ func Start(wg *sync.WaitGroup) {
 
 	//CORS
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"https://suino.io"},
+		AllowOrigins: []string{"*"},
 		AllowMethods: []string{"GET", "POST"},
 		MaxAge:       12 * time.Hour,
 	}))
